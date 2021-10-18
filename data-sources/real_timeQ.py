@@ -5,6 +5,7 @@ import bs4
 import pandas as pd 
 import numpy as np 
 import json
+import datetime
 
 class Main:
     """
@@ -58,10 +59,12 @@ class Main:
                 except TypeError: # Expecting NoneType.
                     print("No server side dev messages/warnings raised.")
                 #Format data.
-                stock_data = {"Symbol":symbol,"Company":company,"Stock Type":stock_type,"Exchange":exchange,
+                stock_data = {
+                    "Time":datetime.now(), "Symbol":symbol,"Company":company,"Stock Type":stock_type,"Exchange":exchange,
                     "Last Sale Price":last_sale_price, "Net Change":net_change, "Percent Change":percent_change,
                     "Delta Indicator":delta_indicator, "Volume":volume, "Previous Close":prev_close,
-                    "Open Price":open_price, "Market Cap":market_cap, "Market Status":market_status}
+                    "Open Price":open_price, "Market Cap":market_cap, "Market Status":market_status
+                    }
                 print(stock_data) 
                 yield stock_data
                 
