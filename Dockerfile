@@ -3,10 +3,11 @@ FROM python:3.8.3-slim-buster
 USER root 
 WORKDIR /project
 
-COPY . .
-RUN apt-get update && apt-get install 
+COPY . ./project
+COPY /opt/mssql-tools/bin/sqlcmd ./project 
+RUN apt-get update 
 RUN pip install -r requirements.txt
 
-
-ENTRYPOINT "ETL.sh"
+# ETL Procedures 
+ENTRYPOINT "ETL.sh"  
 

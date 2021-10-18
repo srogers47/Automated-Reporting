@@ -5,7 +5,11 @@ import bs4
 import pandas as pd 
 import numpy as np 
 import json
+<<<<<<< Updated upstream
 import datetime
+=======
+import csv
+>>>>>>> Stashed changes
 
 class Main:
     """
@@ -32,8 +36,19 @@ class Main:
         Request JSON response containing from nasdaq api through url endpoint.
         Parse extracted data and format in a dictionary.
         """
+        async def write_to_file():
+            """
+            Write quotes to temp csv file.
+            """
+            columns = [k for k,v in stock_data.items()] # Columns are keys of stock_data
+            with open(f"real-time/{symbol}.csv", "ab") as f: 
+                writer = csv.DictWriter(f, fieldnames=columns)
+                writer.writeheader()
+                for data in stock_data:
+                    writer.writerow(data)
+
         #print(stock_symbol)
-        url = f'https://api.nasdaq.com/api/quote/{stock_symbol}/info' # generate urls with list
+        url = f'https://api.nasdaq.cimpoom/api/quote/{stock_symbol}/info' # generate urls with list
         # Temp storage in memeory 
         async with session.get(url, headers=self.headers, params=self.params) as response:  
             r  = await response.json()
@@ -63,15 +78,20 @@ class Main:
                     "Time":datetime.now(), "Symbol":symbol,"Company":company,"Stock Type":stock_type,"Exchange":exchange,
                     "Last Sale Price":last_sale_price, "Net Change":net_change, "Percent Change":percent_change,
                     "Delta Indicator":delta_indicator, "Volume":volume, "Previous Close":prev_close,
+<<<<<<< Updated upstream
                     "Open Price":open_price, "Market Cap":market_cap, "Market Status":market_status
                     }
                 print(stock_data) 
                 yield stock_data
+=======
+                    "Open Price":open_price, "Market Cap":market_cap, "Market Status":market_status}
+                # print(stock_data) S
+                await write_to_file() 
+>>>>>>> Stashed changes
                 
             except AttributeError as a:
                 print(a)
                 print(stock_symbol, "Raised AttributeError...")
-
 
 
     async def fetch(self, loop):
@@ -82,10 +102,7 @@ class Main:
         print(self.symbols) 
         async with aiohttp.ClientSession(loop=loop) as session:
             tasks = [self.get_quotes(session, stock_symbol) for stock_symbol in self.symbols['Symbols']]
-            # INSERT CONTROL FLOW HERE. 
-            #while True: # This program will be a background server process, perpetually running on server start-up for data collection. 
             results = await asyncio.gather(*tasks)
-            #await asyncio.sleep(30) # Real time quotes from api are updated every 30 seconds. Time requests to oscilate every 30 seconds
             return results
 
 
