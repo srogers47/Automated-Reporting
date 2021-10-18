@@ -34,7 +34,7 @@ class Main:
     )
     symbols = pd.read_csv("symlist.csv", delimiter=",") # Read in NASDAQ 100 symbols. 
 
-    async def get_quotes(self, session, stock_symbol): 
+    async def get_quotes(self, session, stock_symbol) -> dict: 
         """
         Get historical stock market data for fortune 100 companies.
         Pass json response to extract_data(). 
@@ -52,7 +52,7 @@ class Main:
 
 
 
-    async def extract_data(self, r, stock_symbol):
+    async def extract_data(self, r, stock_symbol) -> dict:
         """
         Extract data from json response.
         Call store_data coroutine.
@@ -94,7 +94,7 @@ class Main:
         return await self.store_data(temp_dict, stock_symbol) 
 
 
-    async def store_data(self, temp_dict, stock_symbol):
+    async def store_data(self, temp_dict, stock_symbol) -> dict:
         """
         Write historical market data to a csv named with corresponding stock symbal.
         Downloaded historical quotes located in 'historical/' dir.

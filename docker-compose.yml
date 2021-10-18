@@ -1,0 +1,8 @@
+version: "3.7"
+services: 
+  sql-server:
+    image: "mcr.microsoft.com/mssql/server"
+    build: Dockerfile
+    environment:
+      SA_PASSWORD: "password" # NOT SECURE FOR LOCAL DEV ONLY!
+      ACCEPT_EULA: "Y"

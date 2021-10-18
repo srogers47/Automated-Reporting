@@ -26,7 +26,7 @@ class Main:
     )
     symbols = pd.read_csv("symlist.csv", delimiter=",")
 
-    async def get_quotes(self, session, stock_symbol): 
+    async def get_quotes(self, session, stock_symbol) -> dict: 
         """
         Request JSON response containing from nasdaq api through url endpoint.
         Parse extracted data and format in a dictionary.
