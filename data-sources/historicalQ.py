@@ -32,7 +32,8 @@ class Main:
         ('limit', '9999'),
         ('todate', f'{today}'),  
     )
-    symbols = pd.read_csv("symlist.csv", delimiter=",") # Read in NASDAQ 100 symbols. 
+    # NOTE: if not running in docker container, remove project from path to symlist.
+    symbols = pd.read_csv("project/symlist.csv", delimiter=",") # Read in NASDAQ 100 symbols. 
 
     async def get_quotes(self, session, stock_symbol) -> dict: 
         """
@@ -42,7 +43,7 @@ class Main:
         url = f'https://api.nasdaq.com/api/quote/{stock_symbol}/historical' # Use this as base url
         async with session.get(url, headers=self.headers, params=self.params) as response:
             r  = await response.json()
-            print(r)
+            #print(r)
             try:
                 await self.extract_data(r, stock_symbol) 
             except TypeError as t:
@@ -69,7 +70,7 @@ class Main:
         temp_dict = {}
         # Extract 
         symbol = stock_symbol
-        total_records = r['data']['totalRecords'] # Raises innocuous TypeError...
+        total_records = r['data']['totalRecords'] # Last iteration raises innocuous TypeError...
         # Date, Close, volume, open, high, low are located in dict of lists "rows"
         date_rows = r["data"]["tradesTable"]["rows"]   
         for x in date_rows[:]:
@@ -103,7 +104,8 @@ class Main:
         """
         #column_names = ["Symbol", "Total Records", "Date", "Close", "Volume", "Open", "High", "Low"]
         df = pd.DataFrame(temp_dict)
-        df.to_csv(f"historical/{stock_symbol}.csv") 
+        # NOTE project/data-sources in csv path only required when using docker.  Remove to run as standalone. 
+        df.to_csv(f"project/data-sources/historical/{stock_symbol}.csv") 
         print(f"historical/{stock_symbol}.csv successfully written to local storage.") 
 
 
@@ -112,7 +114,7 @@ class Main:
         Initiate aiohttp.ClientSession.
         Generate urls to access real time quotes via nasdaq.com api entry point.
         """
-        print(self.symbols) 
+        #print(self.symbols) 
         async with aiohttp.ClientSession(loop=loop, json_serialize=ujson.dumps) as session:
             tasks = [self.get_quotes(session, stock_symbol) for stock_symbol in self.symbols['Symbols']]
             results = await asyncio.gather(*tasks)
@@ -123,4 +125,3 @@ if __name__=='__main__':
     m = Main() 
     loop = asyncio.get_event_loop() 
     results = loop.run_until_complete(m.fetch()) 
-    print("Program complete") 

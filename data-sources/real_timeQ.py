@@ -3,13 +3,9 @@ import asyncio
 import aiohttp
 import bs4 
 import pandas as pd 
-import numpy as np 
 import json
-<<<<<<< Updated upstream
 import datetime
-=======
 import csv
->>>>>>> Stashed changes
 
 class Main:
     """
@@ -29,7 +25,8 @@ class Main:
     params = (
         ('assetclass', 'stocks'),
     )
-    symbols = pd.read_csv("symlist.csv", delimiter=",")
+    #NOTE if not running in docker-container, remove project/ from path to symlist.
+    symbols = pd.read_csv("project/symlist.csv", delimiter=",")
 
     async def get_quotes(self, session, stock_symbol) -> dict: 
         """
@@ -41,14 +38,15 @@ class Main:
             Write quotes to temp csv file.
             """
             columns = [k for k,v in stock_data.items()] # Columns are keys of stock_data
-            with open(f"real-time/{symbol}.csv", "ab") as f: 
+            # NOTE project/data-sources not needed in PATH if program is run standalone (Not in docker)
+            with open(f"project/data-sources/real-time/{symbol}.csv", "ab") as f: 
                 writer = csv.DictWriter(f, fieldnames=columns)
                 writer.writeheader()
                 for data in stock_data:
                     writer.writerow(data)
 
         #print(stock_symbol)
-        url = f'https://api.nasdaq.cimpoom/api/quote/{stock_symbol}/info' # generate urls with list
+        url = f'https://api.nasdaq.com/api/quote/{stock_symbol}/info' # generate urls with list
         # Temp storage in memeory 
         async with session.get(url, headers=self.headers, params=self.params) as response:  
             r  = await response.json()
@@ -78,16 +76,10 @@ class Main:
                     "Time":datetime.now(), "Symbol":symbol,"Company":company,"Stock Type":stock_type,"Exchange":exchange,
                     "Last Sale Price":last_sale_price, "Net Change":net_change, "Percent Change":percent_change,
                     "Delta Indicator":delta_indicator, "Volume":volume, "Previous Close":prev_close,
-<<<<<<< Updated upstream
                     "Open Price":open_price, "Market Cap":market_cap, "Market Status":market_status
                     }
-                print(stock_data) 
-                yield stock_data
-=======
-                    "Open Price":open_price, "Market Cap":market_cap, "Market Status":market_status}
-                # print(stock_data) S
+                # print(stock_data) 
                 await write_to_file() 
->>>>>>> Stashed changes
                 
             except AttributeError as a:
                 print(a)
@@ -99,7 +91,7 @@ class Main:
         Initiate aiohttp.ClientSession.
         Generate urls to access real time quotes via nasdaq.com
         """
-        print(self.symbols) 
+        #print(self.symbols) 
         async with aiohttp.ClientSession(loop=loop) as session:
             tasks = [self.get_quotes(session, stock_symbol) for stock_symbol in self.symbols['Symbols']]
             results = await asyncio.gather(*tasks)
@@ -109,4 +101,4 @@ class Main:
 if __name__=='__main__':
     m = Main() 
     loop = asyncio.get_event_loop() 
-    results = loop.run_until_complete(m.fetch()) 
+    results = loop.run_until_complete(m.fetch(loop)) 

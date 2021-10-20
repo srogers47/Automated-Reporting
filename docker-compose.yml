@@ -2,7 +2,11 @@ version: "3.7"
 services: 
   sql-server:
     image: "mcr.microsoft.com/mssql/server"
-    build: Dockerfile
+    build: 
+      context: . 
+      dockerfile: ./Dockerfile
     environment:
-      SA_PASSWORD: "password" # NOT SECURE FOR LOCAL DEV ONLY!
+
+      MSSQL_SA_PASSWORD: "12345__Password!" # LOCAL DEV ONLY!
       ACCEPT_EULA: "Y"
+
