@@ -29,10 +29,6 @@ sqlcmd -S localhost -P 12345__password! -Q "CREATE DATABASE sql-server
 	NetChange DECIMAL(5,4),
 	PercentChange DECIMAL(5,4),
 	DeltaIndicator VARCHAR(20) NOT NULL,
-	Volume DECIMAL(5,4),
-	PreviousClose DECIMAL,
-	OpenPrice DECIMAL,
-	MarketCap DECIMAL,
 	MarketStatus VARCHAR(20) NOT NULL);"
   
 
@@ -57,8 +53,8 @@ do
 ##### Data storage procedres T-SQL. #####
   # Bulk copy real time quotes csv files  
   bcp RealTimeData in ./project/data-sources/real-time/* -S localhost -T -P 12345__Password! -d sql-server -c -t',';
+  rm ./project/data-sources/real-time/* # Remove temp files so they are not bcp again.
 # End of data storage procedures 
-# Delete temp files or keep as backup? 
 done 
 
 
